@@ -147,3 +147,162 @@ void topTwo(int *count,int no_of_variables,int *firstmax,int *secondmax)
             *secondmax = i;
     }
 }
+
+clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,int firstmax,int secondmax,int i,int *len)
+{
+    clause **newclauses = (clause **)malloc(no_of_clauses*sizeof(clause *));
+    int k = 0,present,which,pos1,pos2,m,j,l;
+
+    for(j=0;j<no_of_clauses;j++)
+    {
+        present = 0;
+        which = 0;
+        pos1 = -1;
+        pos2 = -1;
+
+        for(l=0;l<clauses[j]->size;l++)
+        {
+            if(abs(clauses[j]->literals[l]) == firstmax || abs(clauses[j]->literals[l]) == secondmax)
+            {
+                present = 1;
+                if(abs(clauses[j]->literals[l]) == firstmax)
+                {
+                    which +=1;
+                    pos1 = l;
+                }
+                if(abs(clauses[j]->literals[l]) == secondmax)
+                {
+                    which+=2;
+                    pos2 = l;
+                }
+            }   
+        }
+        
+        if(present == 0)
+        {
+            newclauses[k] = (clause *)malloc(sizeof(clause));
+            m=0;
+            newclauses[k]->size = clauses[j]->size;
+            newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
+            for(l=0;l<clauses[j]->size;l++)
+            {
+                newclauses[k]->literals[m++] = clauses[j]->literals[l];
+            }
+            k++;
+        }
+
+        if(present == 1)
+        {
+            switch(i)
+            {
+                case 1: if(which == 3)
+                            if(clauses[j]->literals[pos1] < 0 || clauses[j]->literals[pos2] < 0)
+                                continue;
+                        if(which == 2)
+                            if(clauses[j]->literals[pos2] < 0)
+                                continue;
+                        if(which == 1)
+                            if(clauses[j]->literals[pos1] < 0)
+                                continue;
+                        newclauses[k] = (clause *)malloc(sizeof(clause));
+                        if(which == 3)
+                            newclauses[k]->size = clauses[j]->size - 2;
+                        else
+                            newclauses[k]->size = clauses[j]->size - 1;
+
+                        newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
+                        m=0;
+                        for(l=0;l<clauses[j]->size;l++)
+                        {
+                            if(l == pos1 || l == pos2)
+                                continue;
+                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                        }
+                        k++;
+                        break;
+                case 2: if(which == 3)
+                            if(clauses[j]->literals[pos1] < 0 || clauses[j]->literals[pos2] > 0)
+                                continue;
+                        if(which == 2)
+                            if(clauses[j]->literals[pos2] > 0)
+                                continue;
+                        if(which == 1)
+                            if(clauses[j]->literals[pos1] < 0)
+                                continue;
+
+                        newclauses[k] = (clause *)malloc(sizeof(clause));
+                        if(which == 3)
+                            newclauses[k]->size = clauses[j]->size - 2;
+                        else
+                            newclauses[k]->size = clauses[j]->size - 1;
+
+                        newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
+                        m=0;
+                        for(l=0;l<clauses[j]->size;l++)
+                        {
+                            if(l == pos1 || l == pos2)
+                                continue;
+                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                        }
+                        k++;
+                        break;
+                case 3: if(which == 3)
+                            if(clauses[j]->literals[pos1] > 0 || clauses[j]->literals[pos2] < 0)
+                                continue;
+                        if(which == 2)
+                            if(clauses[j]->literals[pos2] < 0)
+                                continue;
+                        if(which == 1)
+                            if(clauses[j]->literals[pos1] > 0)
+                                continue;
+
+                        newclauses[k] = (clause *)malloc(sizeof(clause));
+                        if(which == 3)
+                            newclauses[k]->size = clauses[j]->size - 2;
+                        else
+                            newclauses[k]->size = clauses[j]->size - 1;
+
+                        newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
+                        m=0;
+                        for(l=0;l<clauses[j]->size;l++)
+                        {
+                            if(l == pos1 || l == pos2)
+                                continue;
+                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                        }
+                        k++;
+                        break;
+                case 4: if(which == 3)
+                            if(clauses[j]->literals[pos1] > 0 || clauses[j]->literals[pos2] > 0)
+                                continue;
+                        if(which == 2)
+                            if(clauses[j]->literals[pos2] > 0)
+                                continue;
+                        if(which == 1)
+                            if(clauses[j]->literals[pos1] > 0)
+                                continue;
+
+                        newclauses[k] = (clause *)malloc(sizeof(clause));
+                        if(which == 3)
+                            newclauses[k]->size = clauses[j]->size - 2;
+                        else
+                            newclauses[k]->size = clauses[j]->size - 1;
+
+                        newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
+                        m=0;
+                        for(l=0;l<clauses[j]->size;l++)
+                        {
+                            if(l == pos1 || l == pos2)
+                                continue;
+                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                        }
+                        k++;
+                        break;  
+            }
+            
+        }
+            
+    }
+    *len = k;
+    return newclauses;
+}
