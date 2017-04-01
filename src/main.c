@@ -10,6 +10,7 @@ struct clause
 typedef struct clause clause;
 
 #include "functions.h"
+void performDistribution(clause **clauses,int no_of_clauses,int no_of_variables,int firstmax,int secondmax);
 
 int main(int argc,char **argv)
 {
@@ -22,7 +23,7 @@ int main(int argc,char **argv)
     size_t len = 0;
     size_t read;
     char file_name[13];
-    int i = 0;
+    int i = 0,*count,j,firstmax,secondmax;
     
     fp = fopen(argv[1],"r");
 
@@ -37,10 +38,13 @@ int main(int argc,char **argv)
             processPStatement(line,&no_of_variables,&no_of_clauses); 
             printf("no_of_variables=%d,no_of_clauses=%d\n",no_of_variables,no_of_clauses); 
             clauses = (clause **)malloc(no_of_clauses*sizeof(clause *));
+            count = (int *)malloc((1+no_of_variables)*sizeof(int));
+            for(j = 0;j<=no_of_variables;j++)
+              count[j] = 0;
           }
           else if(line[0] == '-' || (line[0] >='0' && line[0] <='9'))
           {
-            addClause(line,clauses,i);
+            addClause(line,clauses,i,count);
             i++;
             if(i == no_of_clauses)
            	  break;
@@ -57,6 +61,10 @@ int main(int argc,char **argv)
        }
 
        display(clauses,no_of_clauses);
+       
+       topTwo(count,no_of_variables,&firstmax,&secondmax);
+       
+       performDistribution(clauses,no_of_clauses,no_of_variables,firstmax,secondmax);
 	}
 	else
 	{

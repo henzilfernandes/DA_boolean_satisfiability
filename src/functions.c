@@ -69,7 +69,7 @@ void processPStatement(char *line,int *no_of_variables,int *no_of_clauses)
   }
 }
 
-void addClause(char *line,clause **clauses,int i)
+void addClause(char *line,clause **clauses,int i,int *count)
 {
     int len = 0,num;
     int size = strlen(line);
@@ -101,6 +101,9 @@ void addClause(char *line,clause **clauses,int i)
         if(num != 0)
         {
             clauses[i]->literals[len] = num; 
+            if(num<0)
+                num = -1*num;
+            count[num]++;
         }
         len++;
         token = strtok(NULL," ");
@@ -117,4 +120,30 @@ void display(clause **clauses,int no_of_clauses)
         printf("\n");
     }
     printf("\n");
+}
+
+void topTwo(int *count,int no_of_variables,int *firstmax,int *secondmax)
+{
+    int i;
+    if(count[1]>count[2])
+    {
+        *firstmax = 1;
+        *secondmax = 2;
+    }
+    else
+    {
+        *firstmax = 2;
+        *secondmax = 1;
+    }
+
+    for(i=3;i<=no_of_variables;i++)
+    {
+        if(count[i]>*firstmax)
+        {
+            *secondmax = *firstmax;
+            *firstmax = i;
+        }
+        else if(count[i]>*secondmax)
+            *secondmax = i;
+    }
 }
