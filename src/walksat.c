@@ -1,10 +1,10 @@
 #include<stdlib.h>
 #include<limits.h>
 #include<math.h>
-
+#include<stdio.h>
 #define PROB_RAND_WALK 0.5
-#define MAX_FLIPS 100000
-#define MAX_TRIES 1000
+#define MAX_FLIPS 10000
+#define MAX_TRIES 100
 #define SUCCESS 1
 #define FAILURE 0
 
@@ -32,6 +32,7 @@ int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *
     for ( try = 1 ; try <= MAX_TRIES ; try++) 
     {		
         /* Perform a random assignment of TRUE/FALSE to the literals in the clauses */
+        //printf("TRY :%d\n",try);
     	srand(time(NULL));
     	for( lit_no = 0 ; lit_no < no_of_literals ; lit_no++ ) 
     	{
@@ -42,7 +43,7 @@ int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *
 		    	literalAssignment[lit_no] = (lit_no+1);
     	}
 	
-
+        
  	    for ( flip = 1 ; flip <= MAX_FLIPS ; flip++) 
  	    {
 	      // HEURISTIC-1    

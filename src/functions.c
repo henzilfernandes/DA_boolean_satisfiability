@@ -11,6 +11,7 @@ struct  clause
 typedef struct clause clause;
 
 #include "functions.h"
+int modifiedLValueForward(int ,int ,int);
 
 char *trim(char *str)
 {
@@ -151,7 +152,18 @@ void topTwo(int *count,int no_of_variables,int *firstmax,int *secondmax)
 clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,int firstmax,int secondmax,int i,int *len)
 {
     clause **newclauses = (clause **)malloc(no_of_clauses*sizeof(clause *));
-    int k = 0,present,which,pos1,pos2,m,j,l;
+    int k = 0,present,which,pos1,pos2,m,j,l,temp1,temp2;
+
+    if(firstmax > secondmax)
+    {
+        temp1 = firstmax;
+        temp2 = secondmax;
+    }
+    else
+    {
+        temp1 = secondmax;
+        temp2 = firstmax;
+    }
 
     for(j=0;j<no_of_clauses;j++)
     {
@@ -186,7 +198,7 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
             newclauses[k]->literals = (int *)malloc((newclauses[k]->size)*sizeof(int));
             for(l=0;l<clauses[j]->size;l++)
             {
-                newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                newclauses[k]->literals[m++] = modifiedLValueForward(clauses[j]->literals[l],temp1,temp2);
             }
             k++;
         }
@@ -216,7 +228,7 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
                         {
                             if(l == pos1 || l == pos2)
                                 continue;
-                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                            newclauses[k]->literals[m++] = modifiedLValueForward(clauses[j]->literals[l],temp1,temp2);
                         }
                         k++;
                         break;
@@ -242,7 +254,7 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
                         {
                             if(l == pos1 || l == pos2)
                                 continue;
-                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                            newclauses[k]->literals[m++] = modifiedLValueForward(clauses[j]->literals[l],temp1,temp2);
                         }
                         k++;
                         break;
@@ -268,7 +280,7 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
                         {
                             if(l == pos1 || l == pos2)
                                 continue;
-                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                            newclauses[k]->literals[m++] = modifiedLValueForward(clauses[j]->literals[l],temp1,temp2);
                         }
                         k++;
                         break;
@@ -294,7 +306,7 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
                         {
                             if(l == pos1 || l == pos2)
                                 continue;
-                            newclauses[k]->literals[m++] = clauses[j]->literals[l];
+                            newclauses[k]->literals[m++] = modifiedLValueForward(clauses[j]->literals[l],temp1,temp2);
                         }
                         k++;
                         break;  
@@ -305,4 +317,36 @@ clause **getClausesToSend(clause **clauses,int no_of_clauses,int no_of_literals,
     }
     *len = k;
     return newclauses;
+}
+
+int modifiedLValueForward(int value,int firstmax,int secondmax)
+{
+    if(abs(value) < secondmax)
+        return value;
+    if(abs(value) < firstmax)
+    {
+        if(value > 0)
+            return value - 1;
+        return value + 1;
+    }
+
+    if(value > 0)
+        return value-2;
+    return value+2;
+}
+
+int modifiedLValueBackward(int value,int firstmax,int secondmax)
+{
+    if(abs(value) < secondmax)
+        return value;
+    if(abs(value) < firstmax-1)
+    {
+        if(value > 0)
+            return value + 1;
+        return value - 1;
+    }
+
+    if(value > 0)
+        return value+2;
+    return value-2;
 }
