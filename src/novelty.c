@@ -22,6 +22,7 @@ int flipMaxClauseLiteral(int clause_num,clause **clauses,int no_of_clauses,int *
 
 int Novelty(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals)
 {
+    printf("EXECUTING NOVELTY ALGORITHM!\n");
     int try,flip,lit_no,lit_number,i;
     int clause_num,lit_num_in_clause,lastFlipVar;
     int *unSatClauses = (int *)malloc(no_of_clauses*sizeof(int));

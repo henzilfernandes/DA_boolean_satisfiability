@@ -15,13 +15,14 @@ struct clause
 };
 typedef struct clause clause;
 
-int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
+int Novelty_plus(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
 int allClausesSatisfied(clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
 int numOfClausesSatisfied(clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
 int flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
 
-int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals)
+int Novelty_plus(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals)
 {
+	printf("EXECUTING NOVELTY+ ALGORITHM!\n");
     int try,flip,lit_no,lit_number,i;
     int clause_num,lit_num_in_clause;
     int unSatClauseNum;

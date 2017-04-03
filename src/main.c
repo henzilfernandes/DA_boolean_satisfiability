@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <mpi.h>
+
 struct clause
 {
 	int *literals;
@@ -11,10 +12,7 @@ struct clause
 typedef struct clause clause;
 
 #include "functions.h"
-//void performDistribution(clause **clauses,int no_of_clauses,int no_of_variables,int firstmax,int secondmax);
-int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
-int Adaptive_novelty_plus(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
-int Novelty(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
+#include "algorithms.h"
 
 int main(int argc,char **argv)
 {
@@ -39,21 +37,17 @@ int main(int argc,char **argv)
 
   if(my_id == root_process)
   {
-    printf("Master process\n");
-    printf("bsd\n");
+    printf("MASTER PROCESS INITIATED\n");
     fp = fopen("sample4.cnf","r");
-    printf("asd\n");
     if(fp != NULL)
     {
-      //strcpy(file_name,argv[1]);
-      printf("1\n");
       while ((read = getline(&line, &len, fp)) != -1) 
       {
         line = trim(line);
         if(line[0] == 'p')
         {
           processPStatement(line,&no_of_variables,&no_of_clauses); 
-          printf("no_of_variables=%d,no_of_clauses=%d\n",no_of_variables,no_of_clauses); 
+          printf("NUMBER OF LITERALS = %d\nNUMBER OF CLAUSES=%d\n",no_of_variables,no_of_clauses); 
           clauses = (clause **)malloc(no_of_clauses*sizeof(clause *));
           count = (int *)malloc((1+no_of_variables)*sizeof(int));
           for(j = 0;j<=no_of_variables;j++)
@@ -78,10 +72,9 @@ int main(int argc,char **argv)
       }
 
       //display(clauses,no_of_clauses);
-       printf("2\n");
       topTwo(count,no_of_variables,&firstmax,&secondmax);
-      printf("first:%d,second:%d\n",firstmax,secondmax);
-      printf("3\n");
+      //printf("first:%d,second:%d\n",firstmax,secondmax);
+
       clause **send_clauses;
       int send_clauses_len,send_literals_len = no_of_variables-2;
 
@@ -114,7 +107,7 @@ int main(int argc,char **argv)
             if(j == 0)
             {
               literalAssignment = (int *)malloc(no_of_variables*sizeof(int));  
-              printf("\nSolution sender id : %d\n",sender);
+              //printf("\nSolution sender id : %d\n",sender);
               switch(sender)
               {
                 case 1: literalAssignment[firstmax-1] = -1*firstmax;
@@ -151,12 +144,7 @@ int main(int argc,char **argv)
       printf("\n********************SOLUTION*******************\n");
       for(i=0;i<no_of_variables;i++)
       {
-        if(i%10 == 0)
-          printf("\n");
-        if(literalAssignment[i] < 0)
-          printf("%d  ",literalAssignment[i]);
-        else
-          printf(" %d  ",literalAssignment[i]);
+          printf("                     %d                        \n",literalAssignment[i]);
       }
       printf("\n***********************************************\n");
       ierr = MPI_Finalize();
@@ -169,7 +157,7 @@ int main(int argc,char **argv)
   }
   else 
   {
-    printf("slave process: %d\n",my_id);
+    printf("SLAVE PROCESS : %d  INITIATED\n",my_id);
     int recv_literals_len,recv_clauses_len;
     clause **recv_clauses;
     ierr = MPI_Recv( &recv_literals_len, 1, MPI_INT, root_process, send_data_tag, MPI_COMM_WORLD, &status);
@@ -186,12 +174,14 @@ int main(int argc,char **argv)
 
     literalAssignment = (int *)malloc(recv_literals_len*sizeof(int));
     
-    if(my_id == 2 || my_id == 4)
-        j = WalkSat(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
-    else if(my_id == 3)
+    if(my_id == 1)
+        j = Novelty_plus(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
+    else if(my_id == 4)
         j = Novelty(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
-    else if(my_id == 1)
+    else if(my_id == 3)
         j = Adaptive_novelty_plus(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
+    else if(my_id == 2)
+        j =  R_novelty(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
 
     ierr = MPI_Send( &j, 1, MPI_INT, root_process, return_data_tag, MPI_COMM_WORLD);
     if(j == 1)
