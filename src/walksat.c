@@ -2,7 +2,7 @@
 #include<limits.h>
 #include<math.h>
 #include<stdio.h>
-#define PROB_RAND_WALK 0.5
+#define PROB_RAND_WALK 0.01
 #define MAX_FLIPS 10000
 #define MAX_TRIES 100
 #define SUCCESS 1
@@ -18,11 +18,11 @@ typedef struct clause clause;
 int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
 int allClausesSatisfied(clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
 int numOfClausesSatisfied(clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
-void flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
+int flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals);
 
 int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals)
 {
-    int try,flip,lit_no,lit_number;
+    int try,flip,lit_no,lit_number,i;
     int clause_num,lit_num_in_clause;
     int unSatClauseNum;
     double r;
@@ -81,7 +81,7 @@ int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *
 	      }
           else
           { // else flip the literal satisfying max clauses after flipping
-		        flipMaxClauseSatisfyingLiteral(clause_num,clauses,no_of_clauses,literalAssignment,no_of_literals);
+		        i = flipMaxClauseSatisfyingLiteral(clause_num,clauses,no_of_clauses,literalAssignment,no_of_literals);
 	      }
 
          } // flip ..
@@ -131,7 +131,7 @@ int allClausesSatisfied(clause **clauses,int no_of_clauses,int *literalAssignmen
 /*  Flips the literal in the specified clause which causes the 
  *  maximum increase in the number of satisfied clauses 
  */
-void flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals)
+int flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_clauses,int *literalAssignment,int no_of_literals)
 {
     int clauseArrayIndex = clause_num - 1;
     int litSatisfyingMaxClauses;
@@ -177,7 +177,10 @@ void flipMaxClauseSatisfyingLiteral(int clause_num,clause **clauses,int no_of_cl
 		literalAssignment[litSatisfyingMaxClauses-1] = -litSatisfyingMaxClauses; 
       else
 		literalAssignment[litSatisfyingMaxClauses-1] = litSatisfyingMaxClauses;
+	  return 1;
     }
+
+    return 0;
 }
 
 /* Specifies the number of clauses satisfied by current assignment

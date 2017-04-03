@@ -13,6 +13,8 @@ typedef struct clause clause;
 #include "functions.h"
 //void performDistribution(clause **clauses,int no_of_clauses,int no_of_variables,int firstmax,int secondmax);
 int WalkSat(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
+int Adaptive_novelty_plus(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
+int Novelty(clause **clauses,int no_of_clauses,int *flipNum, int *retryNum,int *literalAssignment,int no_of_literals);
 
 int main(int argc,char **argv)
 {
@@ -183,7 +185,13 @@ int main(int argc,char **argv)
     }
 
     literalAssignment = (int *)malloc(recv_literals_len*sizeof(int));
-    j = WalkSat(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
+    
+    if(my_id == 2 || my_id == 4)
+        j = WalkSat(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
+    else if(my_id == 3)
+        j = Novelty(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
+    else if(my_id == 1)
+        j = Adaptive_novelty_plus(recv_clauses,recv_clauses_len,&flipNum, &retryNum,literalAssignment,recv_literals_len);
 
     ierr = MPI_Send( &j, 1, MPI_INT, root_process, return_data_tag, MPI_COMM_WORLD);
     if(j == 1)
