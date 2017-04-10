@@ -141,10 +141,26 @@ int main(int argc,char **argv)
           
       }
 
+      char buffer[5];
+      int l;
       printf("\n********************SOLUTION*******************\n");
       for(i=0;i<no_of_variables;i++)
       {
-          printf("                     %d                        \n",literalAssignment[i]);
+        sprintf(buffer,"%d", literalAssignment[i]);
+        if(literalAssignment[i] > 0)
+        {
+          printf(" ");
+          l = 7-strlen(buffer)-1;
+        }
+        else
+          l = 7-strlen(buffer);
+
+        printf("%s",buffer);
+        
+        for(j=1;j<=l;j++)
+          printf(" ");
+        if((i+1)%7 == 0)
+          printf("\n");
       }
       printf("\n***********************************************\n");
       ierr = MPI_Finalize();
